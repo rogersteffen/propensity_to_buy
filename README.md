@@ -31,7 +31,7 @@ Outline:
 * 05 - Introduce additional features - AOV, time based features, customer categorical attributes
 * 06 - Hyperparameter search
 * 07 - Gradient boost
-* 08 - More features (seasonality + temporal shifting, price sensitivity, categories)
+* 08 - More features (seasonality + temporal shifting, price sensitivity, product categories)
 * 09 - Feed forward neural network
 
 ## My Motivation
