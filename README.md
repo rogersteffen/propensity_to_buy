@@ -36,7 +36,9 @@ Outline:
 
 ## My Motivation
 
-Some feature engineering ideas:
+I've implemented and deployed many flavors of propensity models for dozens of retail companies.  I wanted to further explore some of my more esoteric (or maybe questionable) ideas.  
+
+Feature engineering:
 * Personal seasonality - that is, some buyers will routinely purchase the same time each year ... events, season, birthdays, holidays
 * Price sensitivity - an individuals price sensitivity relative to the current discounts offered
 * (Very detailed) temporal aggregation (aka time based-feature engineering) - here increasing the number of features and using short time slices to see when model improvements taper off
@@ -50,7 +52,6 @@ Data preparation/pre-processing:
 Tools:
 * At work we typically used Spark (so Spark dataframes, MLlib), I wanted to try out Polars & DuckDB
 * PyTorch for feed forward neural network
-
 
 
 
