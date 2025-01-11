@@ -1,6 +1,6 @@
 ## Overview
 
-I'm demonstrating the various levels of sophistication (and perhaps accuracy) of a propensity to buy model. 
+I'm exploring increasing levels of sophistication for a propensity to buy model and measuring the results.
 
 The data is sourced from Kaggle: https://www.kaggle.com/competitions/h-and-m-personalized-fashion-recommendations/
 
@@ -8,10 +8,10 @@ The data is sourced from Kaggle: https://www.kaggle.com/competitions/h-and-m-per
 
 When using a high cost marketing channel it is far more profitable to target customers (or prospects) with a high likelihood of conversion.
 
-Think of all the junk mail you immediately throw away!
+Think of all the junk mail you immediately throw away or the remarketing you ignore.  Or on the flip side, the catalog you dog ear and then plan a shopping trip with a friend.
 
-A propensity model would be one of many steps, including:
-* User graph/deduplication
+A propensity model would be one of many steps to implement a successful marketing campaign, including:
+* Identity resolution (aka deduplication, user graph)
 * Address validation
 * Assure a match-back strategy for in-store purchases
 * A/B/Holdout testing
