@@ -23,16 +23,16 @@ This repository solely focuses on the propensity model.
 In each notebook I intend to limit the scope of exploration to 1-2 topics or ideas.
 
 Outline:
-00 - Rules based - _not started_
-01 - Using simple features with logistic regression & random forest
-02 - Handling of outliers & standardizing features
-03 - Tidy up some repeatable pieces
-04 - Balance the data sets
-05 - Introduce additional features
-06 - Hyperparameter search
-07 - Gradient boost
-08 - More features (seasonality, price sensitivity, categories)
-09 - Feed forward neural network
+* 00 - Rules based - _not started_
+* 01 - Using simple features with logistic regression & random forest
+* 02 - Handling of outliers & standardizing features
+* 03 - Tidy up some repeatable pieces
+* 04 - Balance the data sets
+* 05 - Introduce additional features - AOV, time based features, customer categorical attributes
+* 06 - Hyperparameter search
+* 07 - Gradient boost
+* 08 - More features (seasonality + temporal shifting, price sensitivity, categories)
+* 09 - Feed forward neural network
 
 ## My Motivation
 
@@ -40,7 +40,7 @@ Some feature engineering ideas:
 * Personal seasonality - that is, some buyers will routinely purchase the same time each year ... events, season, birthdays, holidays
 * Price sensitivity - an individuals price sensitivity relative to the current discounts offered
 * (Very detailed) temporal aggregation (aka time based-feature engineering) - here increasing the number of features and using short time slices to see when model improvements taper off
-* Training record augmentation
+* Training record "augmentation" (or temporal shifting, lagged feature stacking, diagonal slices)
 * Regression vs. Classification - allowing for more nuance such as time decayed sum of future transactions
 
 Data preparation/pre-processing:
