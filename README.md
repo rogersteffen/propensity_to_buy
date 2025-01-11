@@ -47,10 +47,10 @@ Feature engineering:
 
 Data preparation/pre-processing:
 * Explore the impact of not balancing, under sampling, oversampling
-* Explore the impact of no Winsorization & mild Winsorization versus no Winsorization (but just row wise outlier treatment)
+* Explore the impact of aggressive Winsorization, moderate Winsorization, and no Winsorization (but just row wise outlier treatment)
 
 Tools:
-* At work we typically used Spark (so Spark dataframes, MLlib), I wanted to try out Polars & DuckDB
+* (At work) I use Spark (so Spark dataframes, MLlib), I wanted to try out Polars & DuckDB
 * PyTorch for feed forward neural network
 
 
