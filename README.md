@@ -32,7 +32,8 @@ Outline:
 * 06 - Hyperparameter search
 * 07 - Gradient boost
 * 08 - More features (seasonality + temporal shifting, price sensitivity, product categories)
-* 09 - Feed forward neural network
+* 09 - PCA - this might move before Gradient Boost depending on results
+* 10 - Feed forward neural network
 
 ## My Motivation
 
