@@ -26,9 +26,8 @@ Outline:
 * 00 - Rules based - _not started_
 * 01 - Using simple features with logistic regression & random forest
 * 02 - Handling of outliers & standardizing features
-* 03 - Tidy up some repeatable pieces
-* 04 - Balance the data sets
-* 05 - Introduce additional features - AOV, time based features, customer categorical attributes
+* 03 - Introduce additional features - AOV, time based features, customer categorical attributes
+* 04 - Tidy up some repeatable pieces (pre processing pipeline + backtest)
 * 06 - Hyperparameter search
 * 07 - Gradient boost
 * 08 - More features (seasonality + temporal shifting, price sensitivity, product categories)

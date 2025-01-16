@@ -2,12 +2,22 @@ import scipy
 from sklearn.metrics import precision_recall_curve, f1_score, roc_auc_score, classification_report
 import numpy as np
 import scikitplot as skplt
+from typing import Optional
 
 
 
 class Evaluator(object):
 
-    def __init__(self, ground_truth, probabilities, predictions=None, threshold=None):
+    def __init__(self, ground_truth: np.ndarray, probabilities: np.ndarray, predictions: Optional[np.ndarray]=None,
+                 threshold: Optional[float]=None):
+        '''
+        This will print out the common evaluation metrics for binary classification.  This is not written (or at least tested)
+        to support multi-class classification (todo: future enhancement perhaps).
+        :param ground_truth: array of ground truth labels
+        :param probabilities: array of probabilities ... supports both just positive class and both positive and negative class
+        :param predictions: if provided, the predicted class
+        :param threshold: if provided, the cut off used to make the predictions
+        '''
         self.ground_truth = ground_truth
         self.predictions = predictions
 
