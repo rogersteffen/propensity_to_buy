@@ -18,6 +18,8 @@ A propensity model would be one of many steps to implement a successful marketin
 
 This repository solely focuses on the propensity model.
 
+![img.png](img.png)
+
 ## Notebooks
 
 In each notebook I intend to limit the scope of exploration to 1-2 topics or ideas.
