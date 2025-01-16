@@ -84,7 +84,7 @@ class CSVDataset():
 
     def run_query_display_results(self, query: str):
 
-        init_notebook_mode(all_interactive=False)
+        init_notebook_mode(all_interactive=True)
 
         # Execute the query and fetch results as an Arrow Table
         arrow_table = self.duckdb_conn.execute(query).fetch_arrow_table()
