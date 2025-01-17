@@ -36,6 +36,10 @@ Outline:
 * 09 - PCA - this might move before Gradient Boost depending on results
 * 10 - Feed forward neural network
 
+Other ideas:
+* 11 - Feature Cross + Dimensional Reduction
+* 12 - Autoencoder as alternative to PCA
+
 ## My Motivation
 
 I've implemented and deployed many flavors of propensity models for dozens of retail companies.  I wanted to further explore some of my more esoteric (or maybe questionable) ideas.  
