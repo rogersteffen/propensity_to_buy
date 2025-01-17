@@ -48,8 +48,9 @@ Feature engineering:
 * Personal seasonality - that is, some buyers will routinely purchase the same time each year ... events, season, birthdays, holidays
 * Price sensitivity - an individuals price sensitivity relative to the current discounts offered
 * (Very detailed) temporal aggregation (aka time based-feature engineering) - here increasing the number of features and using short time slices to see when model improvements taper off
-* Training record "augmentation" (or temporal shifting, lagged feature stacking, diagonal slices)
+* Training record "augmentation" (or temporal shifting, lagged feature stacking, diagonal slices) ... build upon what I've done in the past
 * Regression vs. Classification - allowing for more nuance such as time decayed sum of future transactions
+* Feature crossing + automated feature selection
 
 Data preparation/pre-processing:
 * Explore the impact of not balancing, under sampling, oversampling
@@ -58,6 +59,7 @@ Data preparation/pre-processing:
 Tools:
 * (At work) I use Spark (so Spark dataframes, MLlib), I wanted to try out Polars & DuckDB
 * PyTorch for feed forward neural network
+* Difference dimension reduction technics
 
 
 
