@@ -30,7 +30,9 @@ I think these results will be challenging to improve upon.  I will see.
 
 I probably should have artificially hobbled the baseline for a wow factor!
 
-![img.png](img.png)
+![img_1.png](img_1.png)
+
+(University of Illinois colors)
 
 ## Notebooks
 
