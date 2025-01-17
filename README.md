@@ -59,7 +59,7 @@ Data preparation/pre-processing:
 Tools:
 * (At work) I use Spark (so Spark dataframes, MLlib), I wanted to try out Polars & DuckDB
 * PyTorch for feed forward neural network
-* Difference dimension reduction technics
+* Different dimension reduction technics
 
 
 
