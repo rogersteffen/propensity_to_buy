@@ -18,6 +18,18 @@ A propensity model would be one of many steps to implement a successful marketin
 
 This repository solely focuses on the propensity model.
 
+Here are the results of a backtest of a simple model.  I consider this my **_baseline_**.
+* Recency, Frequency, Monetary features for the entire prior year
+* Random Forest with default parameters
+* Label 60-30 days ago
+* Backtest prior 30 days 
+
+Result: 60k buyers in top 100k ranked customers or in relative terms, 29% of buyers in top 10% of scored customers.
+
+I think these results will be challenging to improve upon.  I will see.  
+
+I probably should have artificial hobbled the baseline for a wow factor!
+
 ![img.png](img.png)
 
 ## Notebooks
