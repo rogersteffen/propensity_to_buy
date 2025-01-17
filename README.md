@@ -71,7 +71,7 @@ Data preparation/pre-processing:
 Tools:
 * (At work) I use Spark (so Spark dataframes, MLlib), I wanted to try out Polars & DuckDB
 * PyTorch for feed forward neural network
-* Different dimension reduction technics
+* Different dimensional reduction technics
 
 
 
