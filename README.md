@@ -28,7 +28,7 @@ Result: 60k buyers in top 100k ranked customers or in relative terms, 29% of buy
 
 I think these results will be challenging to improve upon.  I will see.  
 
-I probably should have artificial hobbled the baseline for a wow factor!
+I probably should have artificially hobbled the baseline for a wow factor!
 
 ![img.png](img.png)
 
