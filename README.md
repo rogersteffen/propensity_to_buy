@@ -43,7 +43,8 @@ Outline:
 * 01 - Using simple features with logistic regression & random forest
 * 02 - Handling of outliers & standardizing features
 * 03 - Introduce additional features - AOV, time based features, customer categorical attributes
-* 04 - Tidy up some repeatable pieces (pre processing pipeline + backtest)
+* 04 - Tidy up some repeatable pieces (pre processing pipeline, features, backtest)
+* 05 - TBD
 * 06 - Hyperparameter search
 * 07 - Gradient boost
 * 08 - More features (seasonality + temporal shifting, price sensitivity, product categories)
