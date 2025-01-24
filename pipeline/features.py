@@ -5,8 +5,17 @@ import duckdb
 from functools import reduce
 
 
-
 class Features:
+
+    BASE_FEATURE_QUERY = '''
+        SELECT
+            t.customer_id
+            {feature_sql}
+        FROM transactions t
+        INNER JOIN customers c ON t.customer_id = c.customer_id
+        WHERE t.t_dat > DATE '{feature_start}' and t.t_dat <= DATE '{feature_end}' 
+        GROUP BY t.customer_id
+    '''
 
     def __init__(self, end_date, feature_duration=365, response_duration=0, additional_offset=0):
         self.end_date = end_date
@@ -73,9 +82,17 @@ class Features:
         return Features.run_query(duckdb_session, response_query)
 
 
-    @staticmethod
-    def get_time_sliced_no_overlap() -> pl.DataFrame:
-        pass
+    def get_time_sliced_no_overlap(self, duckdb_session) -> pl.DataFrame:
+        feature_sql = Features.time_slice_feature_sql(offset_length=28*3, offset_name="quarter", end_interval=4,
+                feature_end=self.feature_end, start_interval=1)
+        earliest_month = Features.time_slice_feature_sql(offset_length=28, offset_name="month", end_interval=13,
+                feature_end=self.feature_end, start_interval=13)
+
+        inner_sql = "\n".join([feature_sql, earliest_month])
+
+        complete_sql = Features.BASE_FEATURE_QUERY.format(feature_sql=inner_sql, feature_start=self.feature_start, feature_end=self.feature_end)
+
+        return Features.run_query(duckdb_session, complete_sql)
 
     @staticmethod
     def get_time_sliced_overlap() -> pl.DataFrame:
