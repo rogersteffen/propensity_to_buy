@@ -82,15 +82,17 @@ class CSVDataset():
 
         self.duckdb_conn.register(viewname, polars_df)
 
+    def run_query(self, query: str) -> pl.DataFrame:
+        arrow_table = self.duckdb_conn.execute(query).fetch_arrow_table()
+
+        # Convert the Arrow Table to a Polars DataFrame
+        return pl.from_arrow(arrow_table)
+
     def run_query_display_results(self, query: str):
 
         init_notebook_mode(all_interactive=False)
 
-        # Execute the query and fetch results as an Arrow Table
-        arrow_table = self.duckdb_conn.execute(query).fetch_arrow_table()
-
-        # Convert the Arrow Table to a Polars DataFrame
-        polars_df = pl.from_arrow(arrow_table)
+        polars_df = self.run_query(query)
 
         display(polars_df)
 
