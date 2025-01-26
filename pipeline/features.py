@@ -100,14 +100,21 @@ class Features:
 
 
     def get_customer_features(self, duckdb_session) -> pl.DataFrame:
+        '''
+        These features are, for the most part, useless.  I round the percent by channel as otherwise a tree algorithm
+        can figure out a rough number of transaction items which is contained in the RFM features.
+
+        :param duckdb_session:
+        :return:
+        '''
 
         customer_sql = '''
             ,ROUND(ROUND(590*SUM(price))/COUNT(DISTINCT t.t_dat)) as aov
             ,MAX(CASE WHEN COALESCE(c.active,0) = 1 THEN 1 ELSE 0 END) AS customer_active
             ,MAX(CASE WHEN COALESCE(c.fashion_news_frequency, 'Empty') in ('Monthly','Reqularly') THEN 1 ELSE 0 END) AS customer_fashion_news_frequency
             ,MAX(CASE WHEN COALESCE(c.FN,0) = 1 THEN 1 ELSE 0 END) AS customer_fn
-            ,ROUND(SUM(CASE WHEN sales_channel_id = 1 THEN 1 ELSE 0 END)/COUNT(1),0) AS primary_sales_channel_01
-            ,ROUND(SUM(CASE WHEN sales_channel_id = 2 THEN 1 ELSE 0  END)/COUNT(1),0) AS primary_sales_channel_02
+            ,ROUND(COUNT(DISTINCT CASE WHEN sales_channel_id = 1 THEN t.t_dat ELSE NULL END)/COUNT(DISTINCT t.t_dat),0) AS primary_sales_channel_01
+            ,ROUND(COUNT(DISTINCT CASE WHEN sales_channel_id = 2 THEN t.t_dat ELSE NULL  END)/COUNT(DISTINCT t.t_dat),0) AS primary_sales_channel_02
             ,MAX(COALESCE(c.age,-1)) as age
         '''
 

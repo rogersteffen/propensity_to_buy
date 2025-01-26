@@ -49,7 +49,7 @@ Outline:
 * 07 - Gradient boost
 * 08 - More features (seasonality + temporal shifting, price sensitivity, product categories)
 * 09 - PCA - this might move before Gradient Boost depending on results
-* 10 - Feed forward neural network
+* 10 - Feed forward neural network (using partially connected layers for different feature groupings)
 
 Other ideas:
 * 11 - Feature Cross + Dimensional Reduction
@@ -58,6 +58,12 @@ Other ideas:
 ## My Motivation
 
 I've implemented and deployed many flavors of propensity models for dozens of retail companies.  I wanted to further explore some of my more esoteric (or maybe questionable) ideas.  
+
+Additionally I needed a way to demonstrate my prior work, to prospective employers, for more technically focused roles.  As I do not have access to my prior work, I'm in part re-creating a small portion, without aid of an existing framework, so I'm evolving that as well.
+
+Besides propensity to buy, I plan a similar series for:
+* Customer segmentation via unsupervised learning
+* Personal product recommendations
 
 Feature engineering:
 * Personal seasonality - that is, some buyers will routinely purchase the same time each year ... events, season, birthdays, holidays
