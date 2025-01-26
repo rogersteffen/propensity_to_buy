@@ -59,9 +59,9 @@ Other ideas:
 
 I've implemented and deployed many flavors of propensity models for dozens of retail companies.  I wanted to further explore some of my more esoteric (or maybe questionable) ideas.  
 
-Additionally I needed a way to demonstrate my prior work, to prospective employers, for more technically focused roles.  As I do not have access to my prior work, I'm in part re-creating a small portion, without aid of an existing framework, so I'm evolving that as well.
+Additionally, I need a way to demonstrate my prior work, to prospective employers, for more technically focused roles.  As I do not have access to my prior work, I'm in part re-creating a small portion of it, without aid of an existing framework and so I'm evolving the pipeline as well.
 
-Besides propensity to buy, I plan a similar series for:
+Besides propensity to buy, I'm planning a similar series for:
 * Customer segmentation via unsupervised learning
 * Personal product recommendations
 
