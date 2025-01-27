@@ -82,22 +82,62 @@ class Features:
         return Features.run_query(duckdb_session, response_query)
 
 
-    def get_time_sliced_no_overlap(self, duckdb_session) -> pl.DataFrame:
-        feature_sql = Features.time_slice_feature_sql(offset_length=28*3, offset_name="quarter", end_interval=4,
+    def get_time_sliced_overlap(self, duckdb_session) -> [str, pl.DataFrame]:
+        week_sql = Features.time_slice_feature_sql(offset_length=7, offset_name="week", end_interval=1,
                 feature_end=self.feature_end, start_interval=1)
-        earliest_month = Features.time_slice_feature_sql(offset_length=28, offset_name="month", end_interval=13,
-                feature_end=self.feature_end, start_interval=13)
+        two_week_sql = Features.time_slice_feature_sql(offset_length=14, offset_name="two_week", end_interval=1,
+                feature_end=self.feature_end, start_interval=1)
+        month_sql = Features.time_slice_feature_sql(offset_length=28, offset_name="month", end_interval=1,
+                feature_end=self.feature_end, start_interval=1)
+        two_month_sql = Features.time_slice_feature_sql(offset_length=2*28, offset_name="two_month", end_interval=1,
+                feature_end=self.feature_end, start_interval=1)
 
-        inner_sql = "\n".join([feature_sql, earliest_month])
+        quarter_sql = Features.time_slice_feature_sql(offset_length=28*3, offset_name="quarter", end_interval=1,
+                feature_end=self.feature_end, start_interval=1)
+
+        half_year = Features.time_slice_feature_sql(offset_length=28*6, offset_name="half", end_interval=1,
+                feature_end=self.feature_end, start_interval=1)
+
+        full_year = Features.time_slice_feature_sql(offset_length=28*13, offset_name="year", end_interval=1,
+                feature_end=self.feature_end, start_interval=1)
+
+        inner_sql = "\n".join([week_sql, two_week_sql, month_sql, two_month_sql, quarter_sql, half_year,full_year])
 
         complete_sql = Features.BASE_FEATURE_QUERY.format(feature_sql=inner_sql, feature_start=self.feature_start, feature_end=self.feature_end)
 
-        return Features.run_query(duckdb_session, complete_sql)
+        return complete_sql, Features.run_query(duckdb_session, complete_sql)
 
-    @staticmethod
-    def get_time_sliced_overlap() -> pl.DataFrame:
-        pass
 
+    def get_time_sliced_no_overlap(self, duckdb_session) -> [str, pl.DataFrame]:
+        week_sql = Features.time_slice_feature_sql(offset_length=7, offset_name="week", end_interval=2,
+                feature_end=self.feature_end, start_interval=1)
+        two_week_sql = Features.time_slice_feature_sql(offset_length=14, offset_name="two_week", end_interval=2,
+                feature_end=self.feature_end, start_interval=2)
+        month_sql = Features.time_slice_feature_sql(offset_length=28, offset_name="month", end_interval=3,
+                feature_end=self.feature_end, start_interval=2)
+
+        quarter_sql = Features.time_slice_feature_sql(offset_length=28*3, offset_name="quarter", end_interval=2,
+                feature_end=self.feature_end, start_interval=2)
+
+        half_year = Features.time_slice_feature_sql(offset_length=28*6, offset_name="half", end_interval=2,
+                feature_end=self.feature_end, start_interval=2)
+
+        earliest_month = Features.time_slice_feature_sql(offset_length=28, offset_name="month", end_interval=13,
+                feature_end=self.feature_end, start_interval=13)
+
+        inner_sql = "\n".join([week_sql, two_week_sql, month_sql, quarter_sql, half_year,earliest_month])
+
+        complete_sql = Features.BASE_FEATURE_QUERY.format(feature_sql=inner_sql, feature_start=self.feature_start, feature_end=self.feature_end)
+
+        return complete_sql, Features.run_query(duckdb_session, complete_sql)
+
+    def get_time_sliced_months(self, duckdb_session) -> [str, pl.DataFrame]:
+        months =  Features.time_slice_feature_sql(offset_length=28, offset_name="month", end_interval=13,
+                feature_end=self.feature_end, start_interval=1)
+
+        complete_sql = Features.BASE_FEATURE_QUERY.format(feature_sql=months, feature_start=self.feature_start, feature_end=self.feature_end)
+
+        return complete_sql, Features.run_query(duckdb_session, complete_sql)
 
     def get_customer_features(self, duckdb_session) -> pl.DataFrame:
         '''
