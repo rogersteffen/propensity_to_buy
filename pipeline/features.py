@@ -35,7 +35,7 @@ class Features:
 
     @staticmethod
     def time_slice_feature_sql(offset_length: int, offset_name: str, end_interval, feature_end='{feature_end}',
-                               start_interval=1):
+                               start_interval=1, sales_channel_id=0):
         '''
         This is a helper utility to general bocks of SQL.   This can be run manually or incorporated into the full query creation.
         :param offset_length: Number of days
@@ -45,6 +45,7 @@ class Features:
         :param start_interval: Default is 1 ... can change if you want, for example, only the second half of a year
         :return:
         '''
+
         block = """
                 ,SUM(CASE WHEN t.t_dat > DATE '{feature_end}' - INTERVAL ({offset_length}*{i}) DAY AND t.t_dat <= DATE '{feature_end}' - INTERVAL ({offset_length}*({i} - 1)) DAY THEN 1 ELSE 0 END)
                     as t_count_{offset_name}_{i}
@@ -53,15 +54,42 @@ class Features:
                 ,SUM(CASE WHEN t.t_dat > DATE '{feature_end}' - INTERVAL ({offset_length}*{i}) DAY AND t.t_dat <= DATE '{feature_end}' - INTERVAL ({offset_length}*({i} - 1)) DAY THEN 590*price ELSE 0 END)
                     as revenue_{offset_name}_{i}
         """
+
+        if sales_channel_id in (1,2):
+            block = """
+                    ,SUM(CASE WHEN t.sales_channel_id = {channel} AND t.t_dat > DATE '{feature_end}' - INTERVAL ({offset_length}*{i}) DAY AND t.t_dat <= DATE '{feature_end}' - INTERVAL ({offset_length}*({i} - 1)) DAY THEN 1 ELSE 0 END)
+                        as t_count_channel_{channel}_{offset_name}_{i}
+                    ,COUNT(DISTINCT CASE WHEN t.sales_channel_id = {channel} AND t.t_dat > DATE '{feature_end}' - INTERVAL ({offset_length}*{i}) DAY AND t.t_dat <= DATE '{feature_end}' - INTERVAL ({offset_length}*({i} - 1)) DAY THEN t.t_dat ELSE NULL END)
+                        as ti_count_channel_{channel}_{offset_name}_{i}
+                    ,SUM(CASE WHEN t.sales_channel_id = {channel} AND t.t_dat > DATE '{feature_end}' - INTERVAL ({offset_length}*{i}) DAY AND t.t_dat <= DATE '{feature_end}' - INTERVAL ({offset_length}*({i} - 1)) DAY THEN 590*price ELSE 0 END)
+                        as revenue_channel_{channel}_{offset_name}_{i}
+            """
+
         result = []
         for i in range(start_interval, end_interval + 1):
-            result.append(block.format(offset_length=offset_length, offset_name=offset_name, feature_end=feature_end, i=i))
+            if sales_channel_id in (1,2):
+                result.append(block.format(offset_length=offset_length, offset_name=offset_name, feature_end=feature_end, i=i, channel=sales_channel_id))
+            else:
+                result.append(block.format(offset_length=offset_length, offset_name=offset_name, feature_end=feature_end, i=i, channel=sales_channel_id))
 
         return "\n".join(result)
 
-    @staticmethod
-    def get_base_features() -> pl.DataFrame:
-        pass
+    def get_base_features(self, duckdb_session) -> [str, pl.DataFrame]:
+        base_sql = '''
+            ,ROUND(590*SUM(price)) as total_revenue
+            ,COUNT(1) as total_items
+            ,COUNT(DISTINCT t_dat) as total_transactions
+            ,DATE '{feature_end}'  - MAX(t.t_dat) as days_since_last
+            ,DATE '{feature_end}' - MIN(t.t_dat) as days_since_first
+            ,MAX(t.t_dat) - MIN(t.t_dat) as days_tenure
+        '''.format(feature_end=self.feature_end)
+
+        complete_sql = Features.BASE_FEATURE_QUERY.format(feature_sql=base_sql, feature_start=self.feature_start,
+                                                          feature_end=self.feature_end)
+
+        print(complete_sql)
+
+        return complete_sql, Features.run_query(duckdb_session, complete_sql)
 
     def get_response_label(self, duckdb_session) -> pl.DataFrame:
         response_query = """
@@ -82,24 +110,24 @@ class Features:
         return Features.run_query(duckdb_session, response_query)
 
 
-    def get_time_sliced_overlap(self, duckdb_session) -> [str, pl.DataFrame]:
+    def get_time_sliced_overlap(self, duckdb_session, sales_channel_id=0) -> [str, pl.DataFrame]:
         week_sql = Features.time_slice_feature_sql(offset_length=7, offset_name="week", end_interval=1,
-                feature_end=self.feature_end, start_interval=1)
+                feature_end=self.feature_end, start_interval=1, sales_channel_id=sales_channel_id)
         two_week_sql = Features.time_slice_feature_sql(offset_length=14, offset_name="two_week", end_interval=1,
-                feature_end=self.feature_end, start_interval=1)
+                feature_end=self.feature_end, start_interval=1, sales_channel_id=sales_channel_id)
         month_sql = Features.time_slice_feature_sql(offset_length=28, offset_name="month", end_interval=1,
-                feature_end=self.feature_end, start_interval=1)
+                feature_end=self.feature_end, start_interval=1, sales_channel_id=sales_channel_id)
         two_month_sql = Features.time_slice_feature_sql(offset_length=2*28, offset_name="two_month", end_interval=1,
-                feature_end=self.feature_end, start_interval=1)
+                feature_end=self.feature_end, start_interval=1, sales_channel_id=sales_channel_id)
 
         quarter_sql = Features.time_slice_feature_sql(offset_length=28*3, offset_name="quarter", end_interval=1,
-                feature_end=self.feature_end, start_interval=1)
+                feature_end=self.feature_end, start_interval=1, sales_channel_id=sales_channel_id)
 
         half_year = Features.time_slice_feature_sql(offset_length=28*6, offset_name="half", end_interval=1,
-                feature_end=self.feature_end, start_interval=1)
+                feature_end=self.feature_end, start_interval=1, sales_channel_id=sales_channel_id)
 
         full_year = Features.time_slice_feature_sql(offset_length=28*13, offset_name="year", end_interval=1,
-                feature_end=self.feature_end, start_interval=1)
+                feature_end=self.feature_end, start_interval=1, sales_channel_id=sales_channel_id)
 
         inner_sql = "\n".join([week_sql, two_week_sql, month_sql, two_month_sql, quarter_sql, half_year,full_year])
 
@@ -108,22 +136,22 @@ class Features:
         return complete_sql, Features.run_query(duckdb_session, complete_sql)
 
 
-    def get_time_sliced_no_overlap(self, duckdb_session) -> [str, pl.DataFrame]:
+    def get_time_sliced_no_overlap(self, duckdb_session, sales_channel_id=0) -> [str, pl.DataFrame]:
         week_sql = Features.time_slice_feature_sql(offset_length=7, offset_name="week", end_interval=2,
-                feature_end=self.feature_end, start_interval=1)
+                feature_end=self.feature_end, start_interval=1, sales_channel_id=sales_channel_id)
         two_week_sql = Features.time_slice_feature_sql(offset_length=14, offset_name="two_week", end_interval=2,
-                feature_end=self.feature_end, start_interval=2)
+                feature_end=self.feature_end, start_interval=2, sales_channel_id=sales_channel_id)
         month_sql = Features.time_slice_feature_sql(offset_length=28, offset_name="month", end_interval=3,
-                feature_end=self.feature_end, start_interval=2)
+                feature_end=self.feature_end, start_interval=2, sales_channel_id=sales_channel_id)
 
         quarter_sql = Features.time_slice_feature_sql(offset_length=28*3, offset_name="quarter", end_interval=2,
-                feature_end=self.feature_end, start_interval=2)
+                feature_end=self.feature_end, start_interval=2, sales_channel_id=sales_channel_id)
 
         half_year = Features.time_slice_feature_sql(offset_length=28*6, offset_name="half", end_interval=2,
-                feature_end=self.feature_end, start_interval=2)
+                feature_end=self.feature_end, start_interval=2, sales_channel_id=sales_channel_id)
 
         earliest_month = Features.time_slice_feature_sql(offset_length=28, offset_name="month", end_interval=13,
-                feature_end=self.feature_end, start_interval=13)
+                feature_end=self.feature_end, start_interval=13, sales_channel_id=sales_channel_id)
 
         inner_sql = "\n".join([week_sql, two_week_sql, month_sql, quarter_sql, half_year,earliest_month])
 
@@ -139,7 +167,7 @@ class Features:
 
         return complete_sql, Features.run_query(duckdb_session, complete_sql)
 
-    def get_customer_features(self, duckdb_session) -> pl.DataFrame:
+    def get_customer_features(self, duckdb_session) -> [str, pl.DataFrame]:
         '''
         These features are, for the most part, useless.  I round the percent by channel as otherwise a tree algorithm
         can figure out a rough number of transaction items which is contained in the RFM features.
@@ -161,24 +189,26 @@ class Features:
         complete_sql = Features.BASE_FEATURE_QUERY.format(feature_sql=customer_sql, feature_start=self.feature_start,
                                                           feature_end=self.feature_end)
 
-        return Features.run_query(duckdb_session, complete_sql)
+        return complete_sql, Features.run_query(duckdb_session, complete_sql)
 
-    @staticmethod
-    def get_all_features_and_response() -> pl.DataFrame:
+    def get_all_features_and_response(self, duckdb_connection) -> pl.DataFrame:
 
         # Sample DataFrames
-        df1 = pl.DataFrame({"id": [1, 2, 3], "value1": [10, 20, 30]})
-        df2 = pl.DataFrame({"id": [1, 2, 3], "value2": [100, 200, 300]})
-        df3 = pl.DataFrame({"id": [1, 2, 3], "value3": [1000, 2000, 3000]})
+        q, df1 = self.get_time_sliced_overlap(duckdb_connection,1)
+        q, df2 = self.get_time_sliced_overlap(duckdb_connection,2)
+        #q, df3 = self.get_time_sliced_overlap(duckdb_connection)
+        q, df5 = self.get_base_features(duckdb_connection)
+        print(q)
+
+        q, df4 = self.get_customer_features(duckdb_connection)
 
         # List of DataFrames to join
-        dfs = [df1, df2, df3]
+        dfs = [df1, df2, df4, df5]
 
         # Joining multiple DataFrames on the same column
-        result = reduce(lambda left, right: left.join(right, on="id", how="inner"), dfs)
+        result = reduce(lambda left, right: left.join(right, on="customer_id", how="inner"), dfs)
 
-        print(result)
-        pass
+        return result
 
     @staticmethod
     def get_season_features() -> pl.DataFrame:
