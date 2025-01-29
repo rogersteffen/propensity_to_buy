@@ -4,6 +4,16 @@ import polars as pl
 import duckdb
 from functools import reduce
 
+class QueryConstants:
+    def __init__(self, end_date, response_duration=0, additional_offest=0, feature_duration=365):
+        self.end_date = end_date
+        self.feature_duration = feature_duration
+        self.response_duration = response_duration
+        self.additional_offset = additional_offest
+
+    def get_params(self):
+        return [self.end_date, self.feature_duration, self.response_duration, self.additional_offset]
+
 
 class Features:
 
@@ -17,11 +27,12 @@ class Features:
         GROUP BY t.customer_id
     '''
 
-    def __init__(self, end_date, feature_duration=365, response_duration=0, additional_offset=0):
-        self.end_date = end_date
-        self.feature_duration = feature_duration
-        self.response_duration = response_duration
-        self.additional_offset = additional_offset # used if backtesting after training
+    def __init__(self, query_constants: QueryConstants):
+        self.end_date = query_constants.end_date
+        self.feature_duration = query_constants.feature_duration
+        self.response_duration = query_constants.response_duration
+        self.additional_offset = query_constants.additional_offset
+
         self.response_end = self.end_date - timedelta(days=self.additional_offset)
         self.feature_end = self.response_end - timedelta(days=self.response_duration)
         self.response_start = self.feature_end # yes both the same ... must be careful!
@@ -87,11 +98,11 @@ class Features:
         complete_sql = Features.BASE_FEATURE_QUERY.format(feature_sql=base_sql, feature_start=self.feature_start,
                                                           feature_end=self.feature_end)
 
-        print(complete_sql)
+        # print(complete_sql)
 
         return complete_sql, Features.run_query(duckdb_session, complete_sql)
 
-    def get_response_label(self, duckdb_session) -> pl.DataFrame:
+    def get_response_label(self, duckdb_session) -> [str, pl.DataFrame]:
         response_query = """
                 SELECT
                     t.customer_id,
@@ -107,7 +118,7 @@ class Features:
         """
 
         response_query = response_query.format(response_start=self.response_start, response_end=self.response_end)
-        return Features.run_query(duckdb_session, response_query)
+        return response_query, Features.run_query(duckdb_session, response_query)
 
 
     def get_time_sliced_overlap(self, duckdb_session, sales_channel_id=0) -> [str, pl.DataFrame]:
@@ -179,7 +190,7 @@ class Features:
         customer_sql = '''
             ,ROUND(ROUND(590*SUM(price))/COUNT(DISTINCT t.t_dat)) as aov
             ,MAX(CASE WHEN COALESCE(c.active,0) = 1 THEN 1 ELSE 0 END) AS customer_active
-            ,MAX(CASE WHEN COALESCE(c.fashion_news_frequency, 'Empty') in ('Monthly','Reqularly') THEN 1 ELSE 0 END) AS customer_fashion_news_frequency
+            ,MAX(COALESCE(c.fashion_news_frequency, 'Empty')) AS customer_fashion_news_frequency
             ,MAX(CASE WHEN COALESCE(c.FN,0) = 1 THEN 1 ELSE 0 END) AS customer_fn
             ,ROUND(COUNT(DISTINCT CASE WHEN sales_channel_id = 1 THEN t.t_dat ELSE NULL END)/COUNT(DISTINCT t.t_dat),0) AS primary_sales_channel_01
             ,ROUND(COUNT(DISTINCT CASE WHEN sales_channel_id = 2 THEN t.t_dat ELSE NULL  END)/COUNT(DISTINCT t.t_dat),0) AS primary_sales_channel_02
@@ -193,12 +204,20 @@ class Features:
 
     def get_all_features_and_response(self, duckdb_connection) -> pl.DataFrame:
 
+        f = self.get_all_features(duckdb_connection)
+        s, r = self.get_response_label(duckdb_connection)
+
+        return f.join(r, on="customer_id", how="inner")
+
+
+
+
+    def get_all_features(self, duckdb_connection) -> pl.DataFrame:
         # Sample DataFrames
-        q, df1 = self.get_time_sliced_overlap(duckdb_connection,1)
-        q, df2 = self.get_time_sliced_overlap(duckdb_connection,2)
-        #q, df3 = self.get_time_sliced_overlap(duckdb_connection)
+        q, df1 = self.get_time_sliced_overlap(duckdb_connection, 1)
+        q, df2 = self.get_time_sliced_overlap(duckdb_connection, 2)
+        # q, df3 = self.get_time_sliced_overlap(duckdb_connection)
         q, df5 = self.get_base_features(duckdb_connection)
-        print(q)
 
         q, df4 = self.get_customer_features(duckdb_connection)
 

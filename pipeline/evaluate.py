@@ -71,7 +71,7 @@ class Evaluator(object):
 
     def display_results(self, dataset_title='Test Dataset'):
 
-        print(f"AUC: {self.auc:.2f}")
+        print(f"AUC: {self.auc:.3f}")
         print(f"Optimal Threshold: {self.optimal_threshold}")
         print(f"Maximum F1 Score: {self.f1_score}")
 
