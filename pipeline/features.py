@@ -209,8 +209,29 @@ class Features:
 
         return f.join(r, on="customer_id", how="inner")
 
+    def get_no_overlap_features_and_response(self, duckdb_connection) -> pl.DataFrame:
 
+        f = self.get_no_overlap_features(duckdb_connection)
+        s, r = self.get_response_label(duckdb_connection)
 
+        return f.join(r, on="customer_id", how="inner")
+
+    def get_no_overlap_features(self, duckdb_connection) -> pl.DataFrame:
+        # Sample DataFrames
+        # q, df1 = self.get_time_sliced_no_overlap(duckdb_connection, 1)
+        # q, df2 = self.get_time_sliced_no_overlap(duckdb_connection, 2)
+        q, df3 = self.get_time_sliced_no_overlap(duckdb_connection)
+        q, df5 = self.get_base_features(duckdb_connection)
+
+        q, df4 = self.get_customer_features(duckdb_connection)
+
+        # List of DataFrames to join
+        dfs = [df3, df4, df5]
+
+        # Joining multiple DataFrames on the same column
+        result = reduce(lambda left, right: left.join(right, on="customer_id", how="inner"), dfs)
+
+        return result
 
     def get_all_features(self, duckdb_connection) -> pl.DataFrame:
         # Sample DataFrames
